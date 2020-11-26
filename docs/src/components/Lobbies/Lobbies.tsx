@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { Button, TextField } from '@material-ui/core';
+import APIUtils from '../../common/APIUtils';
 
 
 class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(newToken: string): void }, { roomCode: string, selectedGame: string }> {
@@ -9,7 +10,7 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
     super(props);
     this.state = {
       roomCode: '',
-      selectedGame: 'Group Voter'
+      selectedGame: 'COLEBOXGAMES'
     }
 
     // state changes
@@ -42,8 +43,7 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
         <h3>Create Lobby</h3>
         <div>
           <select name="createLobbyPicker" onChange={this.handleSelectedGameChange}>
-            <option value="Group Voter">Group Voter</option>
-            <option value="Oh Hell">Oh Hell</option>
+            <option value="COLEBOXGAMES">Cole Box Games</option>
           </select>
         </div>
         <br></br>
@@ -67,34 +67,23 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
     this.joinLobby(this.state.roomCode);
   }
   // api functions
-  public createLobby() {
-    var requestObj = {
-      gameType: this.state.selectedGame,
-      userId: this.props.userId
-    };
-    console.log('fake sending createLobby request...');
-    console.log(requestObj);
+  public async createLobby() {
+    const createLobbyResponse = await APIUtils.requestCreateLobby(this.props.userId, this.state.selectedGame);
 
-    var responseObj = {
-      roomCode: '1234'
+    if (createLobbyResponse.success) {
+      await this.joinLobby(createLobbyResponse.data.lobbyCode);
+    } else {
+      console.log(createLobbyResponse.message);
     }
-
-    this.joinLobby(responseObj.roomCode);
   }
-  public joinLobby(roomCode: string) {
-    var requestObj = {
-      roomCode: roomCode,
-      userId: this.props.userId
-    };
-    console.log('fake sending joinLobby request...');
-    console.log(requestObj);
-
-    var responseObj = {
-      accessToken: 'accessGranted'
+  public async joinLobby(roomCode: string) {
+    const joinLobbyResponse = await APIUtils.requestJoinLobby(this.props.userId, roomCode);
+    if (joinLobbyResponse.success) {
+      this.props.setLobbyAccessToken(joinLobbyResponse.data.accessToken);
+    } else {
+      console.log(joinLobbyResponse.message);
     }
 
-    // TODO handle error checking such as access denied
-    this.props.setLobbyAccessToken(responseObj.accessToken);
   }
 
 }

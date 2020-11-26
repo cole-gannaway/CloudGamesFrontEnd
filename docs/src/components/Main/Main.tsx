@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 import FireBaseConfig from '../../config/firebase.config.json'
 import Login from '../Login/Login';
 import AppMenuBar from '../AppMenuBar/AppMenuBar';
 import Lobbies from '../Lobbies/Lobbies';
 import CurrentUser from '../../common/CurrentUser';
+import Prompts from '../Prompts/Prompts';
 
 // Configure Firebase.
 var config = FireBaseConfig;
 var app = firebase.initializeApp(config);
 var db = firebase.database(app);
-// const LOBBIESREF = firebase.database().ref("lobbies");
 
 class Main extends Component<any, { currentUser: CurrentUser | null, lobbyAccessToken: string | null, gameData: any }> {
   constructor(props: any) {
@@ -27,16 +27,16 @@ class Main extends Component<any, { currentUser: CurrentUser | null, lobbyAccess
 
   public render() {
     var content = null;
-    if (this.state.lobbyAccessToken == null) {
-      if (this.state.currentUser == null) {
-        content = (<Login onLogin={this.onLogin} />);
-      }
-      else {
-        content = (<Lobbies db={db} userId={this.state.currentUser.uid} setLobbyAccessToken={this.setLobbyAccessToken}></Lobbies>);
-      }
+    if (this.state.currentUser == null) {
+      content = (<Login onLogin={this.onLogin} />);
     }
     else {
-      content = (<div>Got a lobby id of {this.state.lobbyAccessToken}!</div>);
+      if (this.state.lobbyAccessToken == null) {
+        content = (<Lobbies db={db} userId={this.state.currentUser.uid} setLobbyAccessToken={this.setLobbyAccessToken}></Lobbies>);
+      }
+      else {
+        content = (<Prompts db={db} userId={this.state.currentUser.uid} accessToken={this.state.lobbyAccessToken}></Prompts>);
+      }
     }
     return <div>
       <AppMenuBar onLogout={this.onLogout}></AppMenuBar>
@@ -56,6 +56,7 @@ class Main extends Component<any, { currentUser: CurrentUser | null, lobbyAccess
   public setLobbyAccessToken(newToken: string) {
     this.setState({ lobbyAccessToken: newToken });
   }
+
 }
 
 export default Main;
