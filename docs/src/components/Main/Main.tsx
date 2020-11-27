@@ -3,7 +3,6 @@ import firebase from 'firebase';
 import FireBaseConfig from '../../config/firebase.config.json'
 import AppMenuBar from '../AppMenuBar/AppMenuBar';
 import Lobbies from '../Lobbies/Lobbies';
-import CurrentUser from '../../common/CurrentUser';
 import Prompts from '../Prompts/Prompts';
 
 // Configure Firebase.

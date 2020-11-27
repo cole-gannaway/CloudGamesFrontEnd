@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import { Button, Typography, Grid } from '@material-ui/core';
+import { Typography, Grid } from '@material-ui/core';
 
 class AppMenuBar extends Component<{}, {}> {
-  constructor(props: any) {
-    super(props);
-
-  }
-
-
   public render() {
     return <div >
       <AppBar position="static">
