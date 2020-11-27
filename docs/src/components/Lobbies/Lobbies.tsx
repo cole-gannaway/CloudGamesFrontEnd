@@ -4,7 +4,7 @@ import { Button, TextField } from '@material-ui/core';
 import APIUtils from '../../common/APIUtils';
 
 
-class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(newToken: string): void }, { roomCode: string, selectedGame: string }> {
+class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(newToken: string): void, setUserId(newId: string): void }, { roomCode: string, selectedGame: string }> {
 
   constructor(props: any) {
     super(props);
@@ -14,6 +14,7 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
     }
 
     // state changes
+    this.handleUserIdChange = this.handleUserIdChange.bind(this);
     this.handleRoomCodeChange = this.handleRoomCodeChange.bind(this);
     this.handleSelectedGameChange = this.handleSelectedGameChange.bind(this);
 
@@ -24,18 +25,26 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
     // api
     this.createLobby = this.createLobby.bind(this);
     this.joinLobby = this.joinLobby.bind(this);
+
+    // helpers
+    this.validateUserId = this.validateUserId.bind(this);
+
   }
 
   public render() {
     return <div>
       <div>
+        <h3>Create Id</h3>
+        <div>
+          <TextField variant="outlined" required error={!(this.validateUserId(this.props.userId))} label="User Id" value={this.props.userId} onChange={this.handleUserIdChange} />
+        </div>
         <h3>Join Lobby</h3>
         <div>
           <TextField variant="outlined" label="Room Code" value={this.state.roomCode} onChange={this.handleRoomCodeChange} />
         </div>
         <br></br>
         <div>
-          <Button variant="outlined" onClick={this.handleJoinLobbyButtonPress}>Join</Button>
+          <Button variant="outlined" disabled={!(this.validateUserId(this.props.userId))} onClick={this.handleJoinLobbyButtonPress}>Join</Button>
         </div>
       </div>
       <br></br>
@@ -48,11 +57,16 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
         </div>
         <br></br>
         <div>
-          <Button variant="outlined" onClick={this.handleCreateLobbyButtonPress}>Create</Button>
+          <Button variant="outlined" disabled={!(this.validateUserId(this.props.userId))} onClick={this.handleCreateLobbyButtonPress}>Create</Button>
         </div>
       </div>
 
     </div >;
+  }
+
+  // handlers
+  public handleUserIdChange(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
+    this.props.setUserId(event.target.value);
   }
   public handleRoomCodeChange(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
     this.setState({ roomCode: event.target.value })
@@ -66,6 +80,18 @@ class Lobbies extends Component<{ db: any, userId: string, setLobbyAccessToken(n
   public handleJoinLobbyButtonPress(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     this.joinLobby(this.state.roomCode);
   }
+
+  // helpers
+  public validateUserId(userId: string) {
+    // can't be empty or null
+    if (userId) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
   // api functions
   public async createLobby() {
     const createLobbyResponse = await APIUtils.requestCreateLobby(this.props.userId, this.state.selectedGame);
